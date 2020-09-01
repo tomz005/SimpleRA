@@ -1,4 +1,4 @@
-#include"page.h"
+#include "page.h"
 
 /**
  * @brief The BufferManager is responsible for reading pages to the main memory.
@@ -20,19 +20,22 @@
  * </p>
  *
  */
-class BufferManager{
+class BufferManager
+{
 
-    deque<Page> pages; 
+    deque<Page> pages;
     bool inPool(string pageName);
     Page getFromPool(string pageName);
     Page insertIntoPool(string tableName, int pageIndex);
+    Page insertIntoPool(string matrixName, int rowNumber, int blockNumber);
 
-    public:
-    
+public:
     BufferManager();
     Page getPage(string tableName, int pageIndex);
+    Page getPage(string matrixName, int rowNumber, int blockNumber);
     void writePage(string pageName, vector<vector<int>> rows);
     void deleteFile(string tableName, int pageIndex);
     void deleteFile(string fileName);
     void writePage(string tableName, int pageIndex, vector<vector<int>> rows, int rowCount);
+    void writePage(string matrixName, string blockName, vector<vector<int>> rows, int columnCount);
 };

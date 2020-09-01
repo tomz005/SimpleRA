@@ -16,11 +16,21 @@ BufferManager::BufferManager()
 Page BufferManager::getPage(string tableName, int pageIndex)
 {
     logger.log("BufferManager::getPage");
-    string pageName = "../data/temp/"+tableName + "_Page" + to_string(pageIndex);
+    string pageName = "../data/temp/" + tableName + "_Page" + to_string(pageIndex);
     if (this->inPool(pageName))
         return this->getFromPool(pageName);
     else
         return this->insertIntoPool(tableName, pageIndex);
+}
+
+Page BufferManager::getPage(string matrixName, int rowNumber, int blockNumber)
+{
+    logger.log("BufferManager::getPage");
+    string pageName = "../data/temp/Matrix/" + matrixName + "_Block" + to_string(rowNumber) + "_" + to_string(blockNumber);
+    if (this->inPool(pageName))
+        return this->getFromPool(pageName);
+    else
+        return this->insertIntoPool(matrixName, rowNumber, blockNumber);
 }
 
 /**
@@ -75,7 +85,16 @@ Page BufferManager::insertIntoPool(string tableName, int pageIndex)
     pages.push_back(page);
     return page;
 }
+Page BufferManager::insertIntoPool(string matrixName, int rowNumber, int blockNumber)
+{
+    logger.log("BufferManager::insertIntoPool");
 
+    Page page(matrixName, to_string(rowNumber) + "_" + to_string(blockNumber));
+    if (this->pages.size() >= BLOCK_COUNT)
+        pages.pop_front();
+    pages.push_back(page);
+    return page;
+}
 /**
  * @brief The buffer manager is also responsible for writing pages. This is
  * called when new tables are created using assignment statements.
@@ -91,7 +110,12 @@ void BufferManager::writePage(string tableName, int pageIndex, vector<vector<int
     Page page(tableName, pageIndex, rows, rowCount);
     page.writePage();
 }
-
+void BufferManager::writePage(string matrixName, string blockName, vector<vector<int>> rows, int columnCount)
+{
+    logger.log("BufferManager::writePage");
+    Page page(matrixName, blockName, rows, columnCount);
+    page.writePage();
+}
 /**
  * @brief Deletes file names fileName
  *
@@ -99,10 +123,11 @@ void BufferManager::writePage(string tableName, int pageIndex, vector<vector<int
  */
 void BufferManager::deleteFile(string fileName)
 {
-    
+
     if (remove(fileName.c_str()))
         logger.log("BufferManager::deleteFile: Err");
-        else logger.log("BufferManager::deleteFile: Success");
+    else
+        logger.log("BufferManager::deleteFile: Success");
 }
 
 /**
@@ -115,6 +140,6 @@ void BufferManager::deleteFile(string fileName)
 void BufferManager::deleteFile(string tableName, int pageIndex)
 {
     logger.log("BufferManager::deleteFile");
-    string fileName = "../data/temp/"+tableName + "_Page" + to_string(pageIndex);
+    string fileName = "../data/temp/" + tableName + "_Page" + to_string(pageIndex);
     this->deleteFile(fileName);
 }

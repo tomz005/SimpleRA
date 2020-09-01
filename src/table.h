@@ -33,7 +33,7 @@ public:
     bool indexed = false;
     string indexedColumn = "";
     IndexingStrategy indexingStrategy = NOTHING;
-    
+
     bool extractColumnNames(string firstLine);
     bool blockify();
     void updateStatistics(vector<int> row);
@@ -58,32 +58,32 @@ public:
  * @tparam T current usaages include int and string
  * @param row 
  */
-template <typename T>
-void writeRow(vector<T> row, ostream &fout)
-{
-    logger.log("Table::printRow");
-    for (int columnCounter = 0; columnCounter < row.size(); columnCounter++)
+    template <typename T>
+    void writeRow(vector<T> row, ostream &fout)
     {
-        if (columnCounter != 0)
-            fout << ", ";
-        fout << row[columnCounter];
+        logger.log("Table::printRow");
+        for (int columnCounter = 0; columnCounter < row.size(); columnCounter++)
+        {
+            if (columnCounter != 0)
+                fout << ", ";
+            fout << row[columnCounter];
+        }
+        fout << endl;
     }
-    fout << endl;
-}
 
-/**
+    /**
  * @brief Static function that takes a vector of valued and prints them out in a
  * comma seperated format.
  *
  * @tparam T current usaages include int and string
  * @param row 
  */
-template <typename T>
-void writeRow(vector<T> row)
-{
-    logger.log("Table::printRow");
-    ofstream fout(this->sourceFileName, ios::app);
-    this->writeRow(row, fout);
-    fout.close();
-}
+    template <typename T>
+    void writeRow(vector<T> row)
+    {
+        logger.log("Table::printRow");
+        ofstream fout(this->sourceFileName, ios::app);
+        this->writeRow(row, fout);
+        fout.close();
+    }
 };

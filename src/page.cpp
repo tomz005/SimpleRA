@@ -51,6 +51,34 @@ Page::Page(string tableName, int pageIndex)
     fin.close();
 }
 
+Page::Page(string matrixName, string blockName)
+{
+    // cout << "Page constructor" << endl;
+    this->tableName = matrixName;
+    this->pageName = "../data/temp/Matrix/" + this->tableName + "_Block" + blockName;
+    // vector<int> row(columnCount, 0);
+    this->rows.assign(1, vector<int>());
+    this->rowCount = 1;
+    this->columnCount = 0;
+    ifstream fin(this->pageName, ios::in);
+    string line;
+    if (getline(fin, line))
+    {
+        stringstream s(line);
+        string word;
+        while (getline(s, word, ' '))
+        {
+            // cout << word << ",";
+            rows[0].push_back(stoi(word));
+            this->columnCount += 1;
+        }
+        // cout << endl;
+    }
+    // cout << rows[0].size() << endl;
+
+    fin.close();
+}
+
 /**
  * @brief Get row from page indexed by rowIndex
  * 
@@ -75,9 +103,18 @@ Page::Page(string tableName, int pageIndex, vector<vector<int>> rows, int rowCou
     this->rows = rows;
     this->rowCount = rowCount;
     this->columnCount = rows[0].size();
-    this->pageName = "../data/temp/"+this->tableName + "_Page" + to_string(pageIndex);
+    this->pageName = "../data/temp/" + this->tableName + "_Page" + to_string(pageIndex);
 }
-
+Page::Page(string matrixName, string blockName, vector<vector<int>> rows, int columnCount)
+{
+    logger.log("Page::Page");
+    this->tableName = matrixName;
+    // this->pageIndex = pageIndex;
+    this->rows = rows;
+    this->rowCount = 1;
+    this->columnCount = columnCount;
+    this->pageName = "../data/temp/Matrix/" + this->tableName + "_Block" + blockName;
+}
 /**
  * @brief writes current page contents to file.
  * 

@@ -23,9 +23,11 @@ bool syntacticParse()
         return syntacticParsePRINT();
     else if (possibleQueryType == "RENAME")
         return syntacticParseRENAME();
-    else if(possibleQueryType == "EXPORT")
+    else if (possibleQueryType == "EXPORT")
         return syntacticParseEXPORT();
-    else if(possibleQueryType == "SOURCE")
+    else if (possibleQueryType == "TRANSPOSE")
+        return syntacticParseTRANSPOSE();
+    else if (possibleQueryType == "SOURCE")
         return syntacticParseSOURCE();
     else
     {
@@ -139,7 +141,8 @@ bool isFileExists(string tableName)
  * @return true 
  * @return false 
  */
-bool isQueryFile(string fileName){
+bool isQueryFile(string fileName)
+{
     fileName = "../data/" + fileName + ".ra";
     struct stat buffer;
     return (stat(fileName.c_str(), &buffer) == 0);

@@ -9,6 +9,14 @@ Cursor::Cursor(string tableName, int pageIndex)
     this->pageIndex = pageIndex;
 }
 
+Cursor::Cursor(string matrixName, int rowNumber, int blockNumber)
+{
+    logger.log("Cursor::Cursor");
+    this->page = bufferManager.getPage(matrixName, rowNumber, blockNumber);
+    this->pagePointer = 0;
+    this->tableName = matrixName;
+    // this->pageIndex = pageIndex;
+}
 /**
  * @brief This function reads the next row from the page. The index of the
  * current row read from the page is indicated by the pagePointer(points to row
@@ -21,9 +29,11 @@ vector<int> Cursor::getNext()
     logger.log("Cursor::geNext");
     vector<int> result = this->page.getRow(this->pagePointer);
     this->pagePointer++;
-    if(result.empty()){
+    if (result.empty())
+    {
         tableCatalogue.getTable(this->tableName)->getNextPage(this);
-        if(!this->pagePointer){
+        if (!this->pagePointer)
+        {
             result = this->page.getRow(this->pagePointer);
             this->pagePointer++;
         }

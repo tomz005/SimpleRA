@@ -1,6 +1,98 @@
 #include "tableCatalogue.h"
+// #include "matrixCatalogue.h"
 
 using namespace std;
+class Matrix
+{
+    // vector<unordered_set<int>> distinctValuesInColumns;
+
+public:
+    string sourceFileName = "";
+    string matrixName = "";
+    // vector<string> columns;
+    // vector<uint> distinctValuesPerColumnCount;
+    uint columnCount = 0;
+    long long int rowCount = 0;
+    uint blockCount = 0;
+    uint maxColumnsPerBlock = 0;
+    vector<uint> rowsPerBlockCount;
+    uint blocksPerRow = 0;
+    // bool indexed = false;
+    // string indexedColumn = "";
+    // MatrixIndexingStrategy indexingStrategy = NOTHING;
+    bool isLastChunk = false;
+    bool isFirstChunk = true;
+
+    bool extractColumnNames(string firstLine);
+    bool blockify();
+    // void updateStatistics(vector<int> row);
+    Matrix();
+    Matrix(string matrixName);
+    // Table(string tableName, vector<string> columns);
+    bool load();
+    // bool isColumn(string columnName);
+    // void renameColumn(string fromColumnName, string toColumnName);
+    // void print();
+    void makePermanent();
+    // bool isPermanent();
+    // void getNextPage(Cursor *cursor);
+    // Cursor getCursor();
+    // int getColumnIndex(string columnName);
+    // void unload();
+
+    /**
+ * @brief Static function that takes a vector of valued and prints them out in a
+ * comma seperated format.
+ *
+ * @tparam T current usaages include int and string
+ * @param row 
+ */
+    template <typename T>
+    void writeRow(vector<T> row, ostream &fout)
+    {
+        logger.log("Matrix::printRow");
+        for (int columnCounter = 0; columnCounter < row.size(); columnCounter++)
+        {
+            if (columnCounter != 0 && this->isFirstChunk)
+                fout << ", ";
+            fout << row[columnCounter];
+        }
+        if (this->isLastChunk)
+            fout << endl;
+    }
+
+    /**
+ * @brief Static function that takes a vector of valued and prints them out in a
+ * comma seperated format.
+ *
+ * @tparam T current usaages include int and string
+ * @param row 
+ */
+    template <typename T>
+    void writeRow(vector<T> row)
+    {
+        logger.log("Matrix::printRow");
+        ofstream fout(this->sourceFileName, ios::app);
+        this->writeRow(row, fout);
+        fout.close();
+    }
+};
+
+class MatrixCatalogue
+{
+
+    unordered_map<string, Matrix *> matrices;
+
+public:
+    MatrixCatalogue() {}
+    void insertMatrix(Matrix *matrix);
+    void deleteMatrix(string matrixName);
+    Matrix *getMatrix(string matrixName);
+    bool isMatrix(string matrixName);
+    // bool isColumnFromTable(string columnName, string matrixName);
+    void print();
+    ~MatrixCatalogue();
+};
 
 enum QueryType
 {
@@ -15,6 +107,7 @@ enum QueryType
     PRINT,
     PROJECTION,
     RENAME,
+    TRANSPOSE,
     SELECTION,
     SORT,
     SOURCE,
@@ -62,6 +155,7 @@ public:
     string distinctRelationName = "";
 
     string exportRelationName = "";
+    string exportMatrixName = "";
 
     IndexingStrategy indexingStrategy = NOTHING;
     string indexColumnName = "";
@@ -75,6 +169,7 @@ public:
     string joinSecondColumnName = "";
 
     string loadRelationName = "";
+    string loadMatrixName = "";
 
     string printRelationName = "";
 
@@ -114,6 +209,7 @@ bool syntacticParseINDEX();
 bool syntacticParseJOIN();
 bool syntacticParseLIST();
 bool syntacticParseLOAD();
+bool syntacticParseTRANSPOSE();
 bool syntacticParsePRINT();
 bool syntacticParsePROJECTION();
 bool syntacticParseRENAME();
