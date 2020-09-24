@@ -26,7 +26,7 @@ Cursor::Cursor(string matrixName, int rowNumber, int blockNumber)
  */
 vector<int> Cursor::getNext()
 {
-    logger.log("Cursor::geNext");
+    logger.log("Cursor::getNext");
     vector<int> result = this->page.getRow(this->pagePointer);
     this->pagePointer++;
     if (result.empty())
@@ -52,4 +52,29 @@ void Cursor::nextPage(int pageIndex)
     this->page = bufferManager.getPage(this->tableName, pageIndex);
     this->pageIndex = pageIndex;
     this->pagePointer = 0;
+}
+/**
+ * @brief Function that reads rows as per block size.
+ *
+ * @param numberOfBlocks 
+ */
+
+vector<vector<int>> Cursor::getBlock(int numberOfBlocks)
+{
+    vector<vector<int>> ans;
+    while (numberOfBlocks--)
+    {
+        vector<int> result = this->page.getRow(this->pagePointer);
+        while (!result.empty())
+        {
+            ans.push_back(result);
+            this->pagePointer++;
+            result = this->page.getRow(this->pagePointer);
+        }
+        int prevIndex = this->pageIndex;
+        tableCatalogue.getTable(this->tableName)->getNextPage(this);
+        if (prevIndex == this->pageIndex)
+            break;
+    }
+    return ans;
 }

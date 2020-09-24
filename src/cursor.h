@@ -18,4 +18,5 @@ public:
     Cursor(string matrixName, int rowNumber, int blockNumber);
     vector<int> getNext();
     void nextPage(int pageIndex);
+    vector<vector<int>> getBlock(int numberOfBlocks);
 };
