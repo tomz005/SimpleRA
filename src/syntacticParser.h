@@ -160,6 +160,7 @@ public:
     IndexingStrategy indexingStrategy = NOTHING;
     string indexColumnName = "";
     string indexRelationName = "";
+    int indexStrategyCount = 1;
 
     BinaryOperator joinBinaryOperator = NO_BINOP_CLAUSE;
     string joinResultRelationName = "";

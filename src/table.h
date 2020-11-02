@@ -33,6 +33,7 @@ public:
     bool indexed = false;
     string indexedColumn = "";
     IndexingStrategy indexingStrategy = NOTHING;
+    string indexFileName = "";
 
     bool extractColumnNames(string firstLine);
     bool blockify();
