@@ -3,6 +3,7 @@
 void executeCommand();
 
 void executeALTER();
+void executeBULKINSERT();
 void executeCLEAR();
 void executeCROSS();
 void executeDISTINCT();

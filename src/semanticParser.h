@@ -3,6 +3,7 @@
 bool semanticParse();
 
 bool semanticParseALTER();
+bool semanticParseBULKINSERT();
 bool semanticParseCLEAR();
 bool semanticParseCROSS();
 bool semanticParseDELETE();

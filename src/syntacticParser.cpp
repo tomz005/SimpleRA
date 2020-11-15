@@ -15,6 +15,8 @@ bool syntacticParse()
         return syntacticParseCLEAR();
     else if (possibleQueryType == "ALTER")
         return syntacticParseALTER();
+    else if (possibleQueryType == "BULK_INSERT")
+        return syntacticParseBULKINSERT();
     else if (possibleQueryType == "INDEX")
         return syntacticParseINDEX();
     else if (possibleQueryType == "LIST")

@@ -97,6 +97,7 @@ public:
 enum QueryType
 {
     ALTER,
+    BULKINSERT,
     CLEAR,
     CROSS,
     DELETE,
@@ -151,6 +152,10 @@ public:
     string alterRelationName = "";
     string alterColumnName = "";
     string alterMethod = "";
+
+    string bulkinsertRelationName = "";
+    string bulkinsertResultantRelationName = "";
+    Table *bulkinsertsourceTable;
 
     string clearRelationName = "";
 
@@ -214,6 +219,7 @@ public:
 
 bool syntacticParse();
 bool syntacticParseALTER();
+bool syntacticParseBULKINSERT();
 bool syntacticParseCLEAR();
 bool syntacticParseCROSS();
 bool syntacticParseDISTINCT();

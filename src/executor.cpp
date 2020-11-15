@@ -8,6 +8,9 @@ void executeCommand()
     case ALTER:
         executeALTER();
         break;
+    case BULKINSERT:
+        executeBULKINSERT();
+        break;
     case CLEAR:
         executeCLEAR();
         break;

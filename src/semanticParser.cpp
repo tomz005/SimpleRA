@@ -7,6 +7,8 @@ bool semanticParse()
     {
     case ALTER:
         return semanticParseALTER();
+    case BULKINSERT:
+        return semanticParseBULKINSERT();
     case CLEAR:
         return semanticParseCLEAR();
     case CROSS:
