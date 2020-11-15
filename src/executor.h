@@ -2,11 +2,14 @@
 
 void executeCommand();
 
+void executeALTER();
 void executeCLEAR();
 void executeCROSS();
 void executeDISTINCT();
+void executeDELETE();
 void executeEXPORT();
 void executeINDEX();
+void executeINSERT();
 void executeJOIN();
 void executeLIST();
 void executeLOAD();

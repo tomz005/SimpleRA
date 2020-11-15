@@ -13,6 +13,8 @@ bool syntacticParse()
 
     if (possibleQueryType == "CLEAR")
         return syntacticParseCLEAR();
+    else if (possibleQueryType == "ALTER")
+        return syntacticParseALTER();
     else if (possibleQueryType == "INDEX")
         return syntacticParseINDEX();
     else if (possibleQueryType == "LIST")
@@ -29,6 +31,10 @@ bool syntacticParse()
         return syntacticParseTRANSPOSE();
     else if (possibleQueryType == "SOURCE")
         return syntacticParseSOURCE();
+    else if (possibleQueryType == "DELETE")
+        return syntacticParseDELETE();
+    else if (possibleQueryType == "INSERT")
+        return syntacticParseINSERT();
     else
     {
         string resultantRelationName = possibleQueryType;

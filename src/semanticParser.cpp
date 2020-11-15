@@ -5,6 +5,8 @@ bool semanticParse()
     logger.log("semanticParse");
     switch (parsedQuery.queryType)
     {
+    case ALTER:
+        return semanticParseALTER();
     case CLEAR:
         return semanticParseCLEAR();
     case CROSS:
@@ -35,6 +37,10 @@ bool semanticParse()
         return semanticParseSOURCE();
     case TRANSPOSE:
         return semanticParseTRANSPOSE();
+    case DELETE:
+        return semanticParseDELETE();
+    case INSERT:
+        return semanticParseINSERT();
     default:
         cout << "SEMANTIC ERROR" << endl;
     }

@@ -5,6 +5,9 @@ void executeCommand()
 
     switch (parsedQuery.queryType)
     {
+    case ALTER:
+        executeALTER();
+        break;
     case CLEAR:
         executeCLEAR();
         break;
@@ -49,6 +52,12 @@ void executeCommand()
         break;
     case TRANSPOSE:
         executeTRANSPOSE();
+        break;
+    case INSERT:
+        executeINSERT();
+        break;
+    case DELETE:
+        executeDELETE();
         break;
     default:
         cout << "PARSING ERROR" << endl;

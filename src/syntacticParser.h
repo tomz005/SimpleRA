@@ -96,11 +96,14 @@ public:
 
 enum QueryType
 {
+    ALTER,
     CLEAR,
     CROSS,
+    DELETE,
     DISTINCT,
     EXPORT,
     INDEX,
+    INSERT,
     JOIN,
     LIST,
     LOAD,
@@ -145,6 +148,10 @@ class ParsedQuery
 public:
     QueryType queryType = UNDETERMINED;
 
+    string alterRelationName = "";
+    string alterColumnName = "";
+    string alterMethod = "";
+
     string clearRelationName = "";
 
     string crossResultRelationName = "";
@@ -161,6 +168,9 @@ public:
     string indexColumnName = "";
     string indexRelationName = "";
     int indexStrategyCount = 1;
+
+    string insertRelationName = "";
+    vector<int> insertVector;
 
     BinaryOperator joinBinaryOperator = NO_BINOP_CLAUSE;
     string joinResultRelationName = "";
@@ -203,11 +213,14 @@ public:
 };
 
 bool syntacticParse();
+bool syntacticParseALTER();
 bool syntacticParseCLEAR();
 bool syntacticParseCROSS();
 bool syntacticParseDISTINCT();
+bool syntacticParseDELETE();
 bool syntacticParseEXPORT();
 bool syntacticParseINDEX();
+bool syntacticParseINSERT();
 bool syntacticParseJOIN();
 bool syntacticParseLIST();
 bool syntacticParseLOAD();
