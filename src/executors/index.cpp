@@ -12,10 +12,10 @@ bool syntacticParseINDEX()
         isValid = true;
     if (tokenizedQuery.size() != 9 || tokenizedQuery[1] != "ON" || tokenizedQuery[3] != "FROM" || tokenizedQuery[5] != "USING" || !isValid)
     {
-        cout << isValid << endl;
+        // cout << isValid << endl;
         // cout << tokenizedQuery.size() << endl;
-        for (int i = 0; i < tokenizedQuery.size(); i++)
-            cout << tokenizedQuery[i] << endl;
+        // for (int i = 0; i < tokenizedQuery.size(); i++)
+        //     cout << tokenizedQuery[i] << endl;
         // cout << ~(tokenizedQuery[7] != "BUCKETS" ^ tokenizedQuery[7] != "FANOUT") << endl;
         if (tokenizedQuery.size() != 7 || tokenizedQuery[1] != "ON" || tokenizedQuery[3] != "FROM" || tokenizedQuery[5] != "USING" || tokenizedQuery[6] != "NOTHING")
         {
@@ -63,8 +63,16 @@ bool semanticParseINDEX()
     Table *table = tableCatalogue.getTable(parsedQuery.indexRelationName);
     if (table->indexed)
     {
-        cout << "SEMANTIC ERROR: Table already indexed" << endl;
-        return false;
+        if (parsedQuery.indexingStrategy != NOTHING)
+        {
+            cout << "SEMANTIC ERROR: Table already indexed" << endl;
+            return false;
+        }
+        if (table->indexedColumn != parsedQuery.indexColumnName)
+        {
+            cout << "SEMANTIC ERROR: Column specified is not indexed" << endl;
+            return false;
+        }
     }
     if (parsedQuery.indexingStrategy != NOTHING && parsedQuery.indexStrategyCount < 1)
     {
@@ -97,6 +105,7 @@ void sort_for_index(map<int, vector<int>> &indexTable)
     int blockCount = 0;
     resultantTable->indexed = true;
     Cursor cursor = resultantTable->getCursor();
+    resultantTable->indexedColumn = parsedQuery.indexColumnName;
     int ColumnIndex = resultantTable->getColumnIndex(parsedQuery.indexColumnName);
     while (true)
     {
@@ -159,15 +168,21 @@ void sort_for_index(map<int, vector<int>> &indexTable)
         bufferManager.writePage(resultantTable->tableName, idx++, sortedPage, sortedPage.size());
     }
     // tableCatalogue.insertTable(resultantTable);
+    resultantTable->indexTable = indexTable;
     system("rm -rf ../data/temp/Phase1");
 }
 void executeINDEX()
 {
     logger.log("executeINDEX");
     map<int, vector<int>> indexTable;
-    sort_for_index(indexTable);
-    // for (auto p : indexTable)
-    //     cout << p.first << "," << p.second << endl;
+    if (parsedQuery.indexingStrategy != NOTHING)
+        sort_for_index(indexTable);
+    else
+    {
+        Table *resultantTable = tableCatalogue.getTable(parsedQuery.indexRelationName);
+        resultantTable->indexed = false;
+        resultantTable->indexTable.clear();
+    }
 
     return;
 }

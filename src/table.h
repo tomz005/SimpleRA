@@ -34,6 +34,7 @@ public:
     string indexedColumn = "";
     IndexingStrategy indexingStrategy = NOTHING;
     string indexFileName = "";
+    map<int, vector<int>> indexTable;
 
     bool extractColumnNames(string firstLine);
     bool blockify();

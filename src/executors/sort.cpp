@@ -104,11 +104,72 @@ void executeSORT()
     bool asc;
     // vector<int> row = cursor.getNext();
     int ColumnIndex = table.getColumnIndex(parsedQuery.sortColumnName);
-    if (tokenizedQuery.size() == 8)
+    if (table.indexed && table.indexedColumn == parsedQuery.sortColumnName)
     {
+        // cout << "Already indexed" << endl;
+        int blockCount = (parsedQuery.sortingStrategy == ASC) ? 0 : table.blockCount;
+        vector<vector<int>> previousRows;
+        while (true)
+        {
+            vector<vector<int>> sortedBlock = cursor.getBlock(1);
+            if (sortedBlock.empty())
+                break;
+            // for (auto entry : sortedBlock)
+            //     resultantTable->writeRow<int>(entry);
+            if (parsedQuery.sortingStrategy == DESC)
+            {
+                reverse(sortedBlock.begin(), sortedBlock.end());
+                int rowsBlock = resultantTable->maxRowsPerBlock;
+                if (blockCount == table.blockCount)
+                {
+                    rowsBlock = (resultantTable->rowCount) % (resultantTable->maxRowsPerBlock);
+                    if (rowsBlock == 0 && resultantTable->rowCount != 0)
+                        rowsBlock = resultantTable->maxRowsPerBlock;
+                }
+                for (auto rows : previousRows)
+                {
+                    sortedBlock.push_back(rows);
+                }
+                previousRows.clear();
+                for (int i = sortedBlock.size() - rowsBlock; i < sortedBlock.size(); i++)
+                {
+                    previousRows.push_back(sortedBlock[i]);
+                }
+                bufferManager.writePage(resultantTable->tableName, --blockCount, previousRows, previousRows.size());
+                previousRows.clear();
+                for (int i = 0; i < sortedBlock.size() - rowsBlock; i++)
+                {
+                    previousRows.push_back(sortedBlock[i]);
+                }
+            }
+            else
+                bufferManager.writePage(resultantTable->tableName, blockCount++, sortedBlock, sortedBlock.size());
+        }
+        // cout << "Write page executed\n";
+        tableCatalogue.insertTable(resultantTable);
+
+        Cursor c = resultantTable->getCursor();
+        // logger.log("Cursor of resultant table");
+        while (true)
+        {
+            vector<vector<int>> sortedBlock = c.getBlock(1);
+            if (sortedBlock.empty())
+                break;
+            for (auto entry : sortedBlock)
+            {
+                for (int g : entry)
+                    cout << g << ",";
+                cout << endl;
+                resultantTable->writeRow<int>(entry);
+            }
+        }
     }
     else
     {
+        if (tokenizedQuery.size() == 8)
+        {
+            parsedQuery.sortBufferSize = 1;
+        }
         system("mkdir ../data/temp/Phase1");
         int blockCount = 0;
         while (true)

@@ -28,6 +28,7 @@ class BufferManager
     Page getFromPool(string pageName);
     Page insertIntoPool(string tableName, int pageIndex);
     Page insertIntoPool(string matrixName, int rowNumber, int blockNumber);
+    void deleteFromPool(string pageName);
 
 public:
     BufferManager();

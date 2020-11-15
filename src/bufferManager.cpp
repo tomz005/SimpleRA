@@ -51,6 +51,19 @@ bool BufferManager::inPool(string pageName)
     return false;
 }
 
+void BufferManager::deleteFromPool(string pageName)
+{
+    logger.log("BufferManager::deleteFromPool");
+    int idx = 0;
+    for (auto page : this->pages)
+    {
+        if (pageName == page.pageName)
+            break;
+        idx += 1;
+    }
+    this->pages.erase(this->pages.begin() + idx);
+}
+
 /**
  * @brief If the page is present in the pool, then this function returns the
  * page. Note that this function will fail if the page is not present in the
@@ -108,7 +121,14 @@ void BufferManager::writePage(string tableName, int pageIndex, vector<vector<int
 {
     logger.log("BufferManager::writePage");
     Page page(tableName, pageIndex, rows, rowCount);
+
     page.writePage();
+    string pageName = "../data/temp/" + tableName + "_Page" + to_string(pageIndex);
+    if (this->inPool(pageName))
+    {
+        this->deleteFromPool(pageName);
+    }
+    // this->insertIntoPool(tableName, pageIndex);
 }
 void BufferManager::writePage(string matrixName, string blockName, vector<vector<int>> rows, int columnCount)
 {
