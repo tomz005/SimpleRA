@@ -10,7 +10,7 @@ bool syntacticParse()
         cout << "SYNTAX ERROR" << endl;
         return false;
     }
-
+    // cout << possibleQueryType << endl;
     if (possibleQueryType == "CLEAR")
         return syntacticParseCLEAR();
     else if (possibleQueryType == "ALTER")
@@ -84,11 +84,13 @@ void ParsedQuery::clear()
     this->crossFirstRelationName = "";
     this->crossSecondRelationName = "";
 
+    this->deleteVector.clear();
     this->distinctResultRelationName = "";
     this->distinctRelationName = "";
 
     this->exportRelationName = "";
 
+    this->insertVector.clear();
     this->indexingStrategy = NOTHING;
     this->indexColumnName = "";
     this->indexRelationName = "";

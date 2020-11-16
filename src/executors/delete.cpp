@@ -5,83 +5,94 @@
  */
 bool syntacticParseDELETE()
 {
-    logger.log("syntacticParseSELECTION");
-    if (tokenizedQuery.size() != 8 || tokenizedQuery[6] != "FROM")
-    {
-        cout << "SYNTAC ERROR" << endl;
-        return false;
-    }
-    parsedQuery.queryType = SELECTION;
-    parsedQuery.selectionResultRelationName = tokenizedQuery[0];
-    parsedQuery.selectionFirstColumnName = tokenizedQuery[3];
-    parsedQuery.selectionRelationName = tokenizedQuery[7];
+    logger.log("syntacticParseDELETE");
 
-    string binaryOperator = tokenizedQuery[4];
-    if (binaryOperator == "<")
-        parsedQuery.selectionBinaryOperator = LESS_THAN;
-    else if (binaryOperator == ">")
-        parsedQuery.selectionBinaryOperator = GREATER_THAN;
-    else if (binaryOperator == ">=" || binaryOperator == "=>")
-        parsedQuery.selectionBinaryOperator = GEQ;
-    else if (binaryOperator == "<=" || binaryOperator == "=<")
-        parsedQuery.selectionBinaryOperator = LEQ;
-    else if (binaryOperator == "==")
-        parsedQuery.selectionBinaryOperator = EQUAL;
-    else if (binaryOperator == "!=")
-        parsedQuery.selectionBinaryOperator = NOT_EQUAL;
-    else
+    if (tokenizedQuery.size() < 5 || tokenizedQuery[0] != "DELETE" || tokenizedQuery[1] != "FROM" || tokenizedQuery[3] != "VALUES")
     {
-        cout << "SYNTAC ERROR" << endl;
+        cout << "DELETE : SYNTAX ERROR" << endl;
         return false;
     }
-    regex numeric("[-]?[0-9]+");
-    string secondArgument = tokenizedQuery[5];
-    if (regex_match(secondArgument, numeric))
+    parsedQuery.queryType = DELETE;
+    // parsedQuery.selectionResultRelationName = tokenizedQuery[2];
+    // parsedQuery.selectionFirstColumnName = tokenizedQuery[3];
+    parsedQuery.deleteRelationName = tokenizedQuery[2];
+    parsedQuery.deleteVector.clear();
+    for (int i = 4; i < tokenizedQuery.size(); i++)
     {
-        parsedQuery.selectType = INT_LITERAL;
-        parsedQuery.selectionIntLiteral = stoi(secondArgument);
+        try
+        {
+            parsedQuery.deleteVector.push_back(stoi(tokenizedQuery[i]));
+        }
+        catch (...)
+        {
+            cout << "SYNTAX ERROR" << endl;
+            return false;
+        }
     }
-    else
-    {
-        parsedQuery.selectType = COLUMN;
-        parsedQuery.selectionSecondColumnName = secondArgument;
-    }
+
     return true;
 }
 
 bool semanticParseDELETE()
 {
-    logger.log("semanticParseSELECTION");
+    logger.log("semanticParseDELETE");
 
-    if (tableCatalogue.isTable(parsedQuery.selectionResultRelationName))
-    {
-        cout << "SEMANTIC ERROR: Resultant relation already exists" << endl;
-        return false;
-    }
-
-    if (!tableCatalogue.isTable(parsedQuery.selectionRelationName))
+    if (!tableCatalogue.isTable(parsedQuery.deleteRelationName))
     {
         cout << "SEMANTIC ERROR: Relation doesn't exist" << endl;
         return false;
     }
-
-    if (!tableCatalogue.isColumnFromTable(parsedQuery.selectionFirstColumnName, parsedQuery.selectionRelationName))
+    Table *table = tableCatalogue.getTable(parsedQuery.deleteRelationName);
+    if (table->columnCount != parsedQuery.deleteVector.size())
     {
-        cout << "SEMANTIC ERROR: Column doesn't exist in relation" << endl;
+        cout << "SEMANTIC ERROR : Columns dont match" << endl;
         return false;
-    }
-
-    if (parsedQuery.selectType == COLUMN)
-    {
-        if (!tableCatalogue.isColumnFromTable(parsedQuery.selectionSecondColumnName, parsedQuery.selectionRelationName))
-        {
-            cout << "SEMANTIC ERROR: Column doesn't exist in relation" << endl;
-            return false;
-        }
     }
     return true;
 }
 
 void executeDELETE()
 {
+    logger.log("executeDELETE");
+    Table *table = tableCatalogue.getTable(parsedQuery.deleteRelationName);
+    vector<vector<int>> storedRows;
+    Cursor cursor = table->getCursor();
+    int blockcount = 0;
+    while (true)
+    {
+        vector<vector<int>> blocks = cursor.getBlock(1);
+        if (blocks.size() == 0)
+            break;
+        for (int i = 0; i < blocks.size(); i++)
+        {
+            if (blocks[i] == parsedQuery.deleteVector)
+                continue;
+            storedRows.push_back(blocks[i]);
+            if (storedRows.size() == table->maxRowsPerBlock)
+            {
+                bufferManager.writePage(table->tableName, blockcount++, storedRows, storedRows.size());
+                storedRows.clear();
+            }
+        }
+    }
+    if (storedRows.size() != 0)
+    {
+        bufferManager.writePage(table->tableName, blockcount++, storedRows, storedRows.size());
+        table->rowsPerBlockCount[blockcount - 1] = storedRows.size();
+        storedRows.clear();
+    }
+    if (blockcount == 0)
+    {
+        tableCatalogue.deleteTable(table->tableName);
+        return;
+    }
+    for (int i = blockcount; i < table->blockCount; i++)
+    {
+        bufferManager.deleteFile(table->tableName, i);
+        table->rowsPerBlockCount.pop_back();
+    }
+    table->blockCount = blockcount;
+    int rowcount = 0;
+    rowcount = accumulate(table->rowsPerBlockCount.begin(), table->rowsPerBlockCount.end(), 0);
+    table->rowCount = rowcount;
 }

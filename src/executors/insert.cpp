@@ -6,15 +6,23 @@
 bool syntacticParseINSERT()
 {
     logger.log("syntacticParseINSERT");
+    // for (auto q : tokenizedQuery)
+    //     cout << q << endl;
+    // cout << (int)(tokenizedQuery[0] != "INSERT") << endl;
+    // cout << (int)(tokenizedQuery[1] != "INTO") << endl;
+    // cout << (int)(tokenizedQuery[3] != "VALUES") << endl;
+    // cout << (int)(tokenizedQuery.size() < 5) << endl;
+
     if (tokenizedQuery.size() < 5 || tokenizedQuery[0] != "INSERT" || tokenizedQuery[1] != "INTO" || tokenizedQuery[3] != "VALUES")
     {
-        cout << "SYNTAX ERROR" << endl;
+        cout << "INSERT : SYNTAX ERROR" << endl;
         return false;
     }
     parsedQuery.queryType = INSERT;
     // parsedQuery.selectionResultRelationName = tokenizedQuery[2];
     // parsedQuery.selectionFirstColumnName = tokenizedQuery[3];
     parsedQuery.insertRelationName = tokenizedQuery[2];
+    parsedQuery.insertVector.clear();
     for (int i = 4; i < tokenizedQuery.size(); i++)
     {
         try
@@ -51,10 +59,23 @@ bool semanticParseINSERT()
 
 void executeINSERT()
 {
+    logger.log("executeINSERT");
     Table *table = tableCatalogue.getTable(parsedQuery.insertRelationName);
-    string oldfilename = table->sourceFileName;
-    string newfilename = "../data/temp/" + table->tableName + ".csv";
-    string command = "cp " + oldfilename + " " + newfilename;
-    system(command.c_str());
-    table->sourceFileName = newfilename;
+    // Table *resultantTable = new Table(table->tableName, table->columns);
+    Cursor cursor = Cursor(table->tableName, table->blockCount - 1);
+    vector<vector<int>> blocks = cursor.getBlock(1);
+    if (blocks.size() == table->maxRowsPerBlock)
+    {
+        bufferManager.writePage(table->tableName, table->blockCount, vector<vector<int>>(1, parsedQuery.insertVector), 1);
+        table->blockCount += 1;
+        table->rowsPerBlockCount.push_back(1);
+    }
+    else
+    {
+        blocks.push_back(parsedQuery.insertVector);
+        bufferManager.writePage(table->tableName, (table->blockCount) - 1, blocks, blocks.size());
+        table->rowsPerBlockCount[table->blockCount - 1] += 1;
+    }
+
+    table->rowCount += 1;
 }

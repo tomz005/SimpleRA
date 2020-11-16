@@ -176,6 +176,9 @@ public:
     string distinctResultRelationName = "";
     string distinctRelationName = "";
 
+    string deleteRelationName = "";
+    vector<int> deleteVector;
+
     string exportRelationName = "";
     string exportMatrixName = "";
 
