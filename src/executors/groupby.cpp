@@ -1,7 +1,7 @@
 #include "global.h"
 /**
  * @brief 
- * SYNTAX: R <- SELECT column_name bin_op [column_name | int_literal] FROM relation_name
+ * SYNTAX: <new_table> <- GROUP BY <grouping_attribute> FROM <table_name> RETURN MAX|MIN|SUM|AVG(<attribute>)
  */
 bool syntacticParseGROUPBY()
 {

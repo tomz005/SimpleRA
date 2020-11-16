@@ -1,7 +1,7 @@
 #include "global.h"
 /**
  * @brief 
- * SYNTAX: R <- SELECT column_name bin_op [column_name | int_literal] FROM relation_name
+ * SYNTAX: DELETE​ ​ FROM​ <table_name> ​ VALUES​ <value1>[,<value2>]*
  */
 bool syntacticParseDELETE()
 {

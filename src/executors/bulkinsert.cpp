@@ -1,7 +1,7 @@
 #include "global.h"
 /**
  * @brief 
- * SYNTAX: R <- SELECT column_name bin_op [column_name | int_literal] FROM relation_name
+ * SYNTAX: BULK_INSERT <csv_file_name> INTO <table_name>
  */
 bool syntacticParseBULKINSERT()
 {

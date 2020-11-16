@@ -1,7 +1,7 @@
 #include "global.h"
 /**
  * @brief 
- * SYNTAX: R <- SELECT column_name bin_op [column_name | int_literal] FROM relation_name
+ * SYNTAX: ALTER TABLE <table_name> ADD|DELETE COLUMN <column_name>
  */
 bool syntacticParseALTER()
 {
@@ -33,12 +33,12 @@ bool semanticParseALTER()
     Table *table = tableCatalogue.getTable(parsedQuery.alterRelationName);
     if (parsedQuery.alterMethod == "DELETE" && find(table->columns.begin(), table->columns.end(), parsedQuery.alterColumnName) == table->columns.end())
     {
-        cout << "SEMANTIC ERROR: @TA dekh k dalo bhai." << endl;
+        cout << "SEMANTIC ERROR: Column doesnt exist" << endl;
         return false;
     }
     if (parsedQuery.alterMethod == "ADD" && find(table->columns.begin(), table->columns.end(), parsedQuery.alterColumnName) != table->columns.end())
     {
-        cout << "SEMANTIC ERROR: @TA kitni baar daloge?" << endl;
+        cout << "SEMANTIC ERROR: Column already exists." << endl;
         return false;
     }
     return true;
