@@ -56,6 +56,8 @@ bool syntacticParse()
             return syntacticParseCROSS();
         else if (possibleQueryType == "DISTINCT")
             return syntacticParseDISTINCT();
+        else if (possibleQueryType == "GROUP")
+            return syntacticParseGROUPBY();
         else if (possibleQueryType == "SORT")
             return syntacticParseSORT();
         else

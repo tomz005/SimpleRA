@@ -17,6 +17,8 @@ bool semanticParse()
         return semanticParseDISTINCT();
     case EXPORT:
         return semanticParseEXPORT();
+    case GROUPBY:
+        return semanticParseGROUPBY();
     case INDEX:
         return semanticParseINDEX();
     case JOIN:

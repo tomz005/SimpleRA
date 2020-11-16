@@ -38,6 +38,7 @@ Table::Table(string tableName, vector<string> columns)
     this->tableName = tableName;
     this->columns = columns;
     this->columnCount = columns.size();
+    // cout << this->columnCount << endl;
     this->maxRowsPerBlock = (uint)((BLOCK_SIZE * 1000) / (32 * columnCount));
     this->writeRow<string>(columns);
 }
@@ -59,8 +60,14 @@ bool Table::load()
     {
         fin.close();
         if (this->extractColumnNames(line))
+        {
+            // cout << "Column names extracted" << endl;
             if (this->blockify())
+            {
+                // cout << "Blockify done\n";
                 return true;
+            }
+        }
     }
     fin.close();
     return false;
@@ -83,6 +90,7 @@ bool Table::extractColumnNames(string firstLine)
     stringstream s(firstLine);
     while (getline(s, word, ','))
     {
+        // cout << word << endl;
         word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
         if (columnNames.count(word))
             return false;
@@ -90,6 +98,8 @@ bool Table::extractColumnNames(string firstLine)
         this->columns.emplace_back(word);
     }
     this->columnCount = this->columns.size();
+    // cout << "Extract";
+    // cout << this->columnCount << endl;
     this->maxRowsPerBlock = (uint)((BLOCK_SIZE * 1000) / (32 * this->columnCount));
     return true;
 }
@@ -116,6 +126,8 @@ bool Table::blockify()
     getline(fin, line);
     while (getline(fin, line))
     {
+        // cout << line << endl;
+        // cout << this->columnCount << endl;
         stringstream s(line);
         for (int columnCounter = 0; columnCounter < this->columnCount; columnCounter++)
         {

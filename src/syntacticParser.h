@@ -103,6 +103,7 @@ enum QueryType
     DELETE,
     DISTINCT,
     EXPORT,
+    GROUPBY,
     INDEX,
     INSERT,
     JOIN,
@@ -134,6 +135,15 @@ enum SortingStrategy
     ASC,
     DESC,
     NO_SORT_CLAUSE
+};
+
+enum GroupingStrategy
+{
+    MIN,
+    MAX,
+    AVG,
+    SUM
+
 };
 
 enum SelectType
@@ -168,6 +178,12 @@ public:
 
     string exportRelationName = "";
     string exportMatrixName = "";
+
+    string groupbyRelationName = "";
+    string groupbyResultantRelationName = "";
+    string groupbyGroupColumnName = "";
+    string groupbyResultantColumnName = "";
+    GroupingStrategy groupingstrategy = MIN;
 
     IndexingStrategy indexingStrategy = NOTHING;
     string indexColumnName = "";
@@ -225,6 +241,7 @@ bool syntacticParseCROSS();
 bool syntacticParseDISTINCT();
 bool syntacticParseDELETE();
 bool syntacticParseEXPORT();
+bool syntacticParseGROUPBY();
 bool syntacticParseINDEX();
 bool syntacticParseINSERT();
 bool syntacticParseJOIN();

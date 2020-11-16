@@ -23,6 +23,9 @@ void executeCommand()
     case EXPORT:
         executeEXPORT();
         break;
+    case GROUPBY:
+        executeGROUPBY();
+        break;
     case INDEX:
         executeINDEX();
         break;

@@ -9,6 +9,7 @@ void executeCROSS();
 void executeDISTINCT();
 void executeDELETE();
 void executeEXPORT();
+void executeGROUPBY();
 void executeINDEX();
 void executeINSERT();
 void executeJOIN();
